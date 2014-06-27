@@ -355,6 +355,7 @@ class AccessToken(OAuthView, Mixin):
     * :attr:`get_access_token`
     * :attr:`create_access_token`
     * :attr:`create_refresh_token`
+    * :attr:`update_refresh_token`
     * :attr:`invalidate_grant`
     * :attr:`invalidate_access_token`
     * :attr:`invalidate_refresh_token`
@@ -428,6 +429,15 @@ class AccessToken(OAuthView, Mixin):
         Override to handle refresh token creation.
 
         :return: ``object`` - Refresh token
+        """
+        raise NotImplementedError
+
+    def update_refresh_token(self, refresh_token, access_token):
+        """
+        Override to handle refresh token updating. Bind the access token to
+        the refresh token.
+
+        :return None:
         """
         raise NotImplementedError
 
@@ -530,12 +540,16 @@ class AccessToken(OAuthView, Mixin):
         rt = self.get_refresh_token_grant(request, data, client)
 
         # this must be called first in case we need to purge expired tokens
-        self.invalidate_refresh_token(rt)
+        if not constants.KEEP_REFRESH_TOKEN:
+            self.invalidate_refresh_token(rt)
         self.invalidate_access_token(rt.access_token)
 
         at = self.create_access_token(request, rt.user, rt.access_token.scope,
                 client)
-        rt = self.create_refresh_token(request, at.user, at.scope, at, client)
+        if not constants.KEEP_REFRESH_TOKEN:
+            rt = self.create_refresh_token(request, at.user, at.scope, at, client)
+        else:
+            self.update_refresh_token(rt, at)
 
         return self.access_token_response(at)
 

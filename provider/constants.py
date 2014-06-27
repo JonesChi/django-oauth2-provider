@@ -44,3 +44,6 @@ SINGLE_ACCESS_TOKEN = getattr(settings, 'OAUTH_SINGLE_ACCESS_TOKEN', False)
 
 # Limit the number of refresh token for the same client with same scope (0 is unlimit)
 LIMIT_NUM_REFRESH_TOKEN = getattr(settings, 'OAUTH_LIMIT_NUM_REFRESH_TOKEN', 0)
+
+# Do not invalidate the refresh token when using the it to refresh access token
+KEEP_REFRESH_TOKEN = getattr(settings, 'OAUTH_KEEP_REFRESH_TOKEN', False)
