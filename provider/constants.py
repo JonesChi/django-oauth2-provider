@@ -41,3 +41,6 @@ ENFORCE_CLIENT_SECURE = getattr(settings, 'OAUTH_ENFORCE_CLIENT_SECURE', True)
 SESSION_KEY = getattr(settings, 'OAUTH_SESSION_KEY', 'oauth')
 
 SINGLE_ACCESS_TOKEN = getattr(settings, 'OAUTH_SINGLE_ACCESS_TOKEN', False)
+
+# Limit the number of refresh token for the same client with same scope (0 is unlimit)
+LIMIT_NUM_REFRESH_TOKEN = getattr(settings, 'OAUTH_LIMIT_NUM_REFRESH_TOKEN', 0)

@@ -358,6 +358,7 @@ class AccessToken(OAuthView, Mixin):
     * :attr:`invalidate_grant`
     * :attr:`invalidate_access_token`
     * :attr:`invalidate_refresh_token`
+    * :attr:`invalidate_refresh_tokens_over_limit`
 
     The default implementation supports the grant types defined in
     :attr:`grant_types`.
@@ -448,6 +449,16 @@ class AccessToken(OAuthView, Mixin):
         """
         raise NotImplementedError
 
+    def invalidate_refresh_tokens_over_limit(self, user, scope, client, limit):
+        """
+        Override to handle refresh tokens invalidation to comply the limits.
+        When limit number of refresh token is enabled, invalidate the oldest
+        refresh tokens to comply with the limits.
+
+        :return None:
+        """
+        raise NotImplementedError
+
     def invalidate_access_token(self, access_token):
         """
         Override to handle access token invalidation. When a new access token
@@ -504,6 +515,9 @@ class AccessToken(OAuthView, Mixin):
             at = self.create_access_token(request, grant.user, grant.scope, client)
             rt = self.create_refresh_token(request, grant.user, grant.scope, at,
                     client)
+            if constants.LIMIT_NUM_REFRESH_TOKEN > 0:
+                self.invalidate_refresh_tokens_over_limit(grant.user, grant.scope, client,
+                        constants.LIMIT_NUM_REFRESH_TOKEN)
 
         self.invalidate_grant(grant)
 
@@ -541,6 +555,9 @@ class AccessToken(OAuthView, Mixin):
             # Public clients don't get refresh tokens
             if client.client_type != 1:
                 rt = self.create_refresh_token(request, user, scope, at, client)
+                if constants.LIMIT_NUM_REFRESH_TOKEN > 0:
+                    self.invalidate_refresh_tokens_over_limit(user, scope, client,
+                            constants.LIMIT_NUM_REFRESH_TOKEN)
 
         return self.access_token_response(at)
 
