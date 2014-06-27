@@ -117,6 +117,10 @@ class AccessTokenView(AccessTokenView):
             client=client
         )
 
+    def update_refresh_token(self, rt, at):
+        rt.access_token = at
+        rt.save()
+
     def invalidate_grant(self, grant):
         if constants.DELETE_EXPIRED:
             grant.delete()

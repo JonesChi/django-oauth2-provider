@@ -565,6 +565,30 @@ class AccessTokenTest(BaseOAuth2TestCase):
 
         constants.LIMIT_NUM_REFRESH_TOKEN = 0
 
+    def test_keeping_refresh_token(self):
+        constants.KEEP_REFRESH_TOKEN = True
+
+        token = self._login_authorize_get_token()
+
+        response = self.client.post(self.access_token_url(), {
+            'grant_type': 'refresh_token',
+            'refresh_token': token['refresh_token'],
+            'client_id': self.get_client().client_id,
+            'client_secret': self.get_client().client_secret,
+        })
+
+        self.assertEqual(200, response.status_code)
+
+        response = self.client.post(self.access_token_url(), {
+            'grant_type': 'refresh_token',
+            'refresh_token': token['refresh_token'],
+            'client_id': self.get_client().client_id,
+            'client_secret': self.get_client().client_secret,
+        })
+
+        self.assertEqual(200, response.status_code)
+
+        constants.KEEP_REFRESH_TOKEN = False
 
 class AuthBackendTest(BaseOAuth2TestCase):
     fixtures = ['test_oauth2']
