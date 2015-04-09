@@ -48,6 +48,9 @@ class Client(models.Model):
     def __unicode__(self):
         return self.redirect_uri
 
+    class Meta:
+        app_label = 'oauth2'
+
     def get_default_token_expiry(self):
         public = (self.client_type == 1)
         return get_token_expiry(public)
@@ -108,6 +111,9 @@ class Grant(models.Model):
     def __unicode__(self):
         return self.code
 
+    class Meta:
+        app_label = 'oauth2'
+
 
 class AccessToken(models.Model):
     """
@@ -140,6 +146,9 @@ class AccessToken(models.Model):
 
     def __unicode__(self):
         return self.token
+
+    class Meta:
+        app_label = 'oauth2'
 
     def save(self, *args, **kwargs):
         if not self.expires:
@@ -188,3 +197,6 @@ class RefreshToken(models.Model):
 
     def __unicode__(self):
         return self.token
+
+    class Meta:
+        app_label = 'oauth2'
